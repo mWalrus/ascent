@@ -4,7 +4,7 @@ SCRIPTPATH="$( cd "$(dirname "$0")" ; pwd -P )"
 
 echo "UnloadTheme" > $XDG_RUNTIME_DIR/leftwm/commands.pipe
 
-pkill lemonbar
+pkill polybar
 pkill compton
 pkill picom
-pkill lemonbar
+pkill polybar

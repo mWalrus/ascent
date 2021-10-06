@@ -16,15 +16,20 @@ elif [ -x "$(command -v picom)" ]; then
   picom &> /dev/null &
 fi
 
+#set background
+if [ -x "$(command -v feh)" ]; then
+  feh --bg-fill "$SCRIPTPATH"/background-2.png
+fi
+
 #set the theme.toml config
 echo "LoadTheme $SCRIPTPATH/theme.toml" > $XDG_RUNTIME_DIR/leftwm/commands.pipe
 
-#boot lemonbar and pipe the status of left into it
-sizes=( $(leftwm-state -q -n -t $SCRIPTPATH/sizes.liquid | sed -r '/^\s*$/d') )
-
-index=0
-for size in "${sizes[@]}"
-do
-   leftwm-state -w $index -t $SCRIPTPATH/template.liquid | lemonbar -g $size -F#FFFFFFFF -B#AA222222&
-   let index=index+1
-done
+#boot polybar based on the number of monitors found
+if [ -x "$(command -v polybar)" ]; then
+  pkill polybar
+  monitors="$(polybar -m | sed s/:.*// | tac)"
+  while read -r display; do
+    MONITOR=$display polybar -c "$SCRIPTPATH/polybar.config" mainbar &> /dev/null &
+  done <<< "$monitors"
+  exit 0
+fi

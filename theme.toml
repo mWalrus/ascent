@@ -1,3 +1,5 @@
 border_width = 1
-margin = 3
-focused_border_color = "#A070FF"
+margin = 5
+workspace_margin = 5
+focused_border_color = "#a3be8c"
+floating_border_color = "#88c0d0"
