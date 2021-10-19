@@ -8,6 +8,30 @@ if [ -f "/tmp/leftwm-theme-down" ]; then
 fi
 ln -s $SCRIPTPATH/down /tmp/leftwm-theme-down
 
+DUNST_DIR=$HOME/.config/dunst
+
+# create the config dir if nonexistant
+if [ ! -d "$DUNST_DIR" ]; then
+  mkdir -p $DUNST_DIR
+fi
+
+DUNSTRC_PATH="$DUNST_DIR/dunstrc"
+
+# check if the rc file exists and remove it if it does
+if [ -f "$DUNSTRC_PATH" ]; then
+  rm -f $DUNSTRC_PATH
+fi
+# Copy the template file to the user config directory
+cp dunstrc.tmpl $DUNSTRC_PATH
+
+# hacky workaround to problem with dunst config not being able to read relative paths.
+# find the lines to replace with paths
+line_nums=$(awk '/<ICON_PATH_PLACEHOLDER>/ {print FNR}' dunstrc.tmpl)
+icon_names=$(ls $SCRIPTPATH/notif-icons)
+# iterate and apply each path to each line in the file
+for i in "${!line_nums[@]}"; do
+  sed -i "${line_nums[$i]}s|.*|    icon = $SCRIPTPATH/notif-icons/${icon_names[$i]}|" $DUNSTRC_PATH
+done
 
 #boot compton or picom if it exists
 if [ -x "$(command -v compton)" ]; then
@@ -33,3 +57,4 @@ if [ -x "$(command -v polybar)" ]; then
   done <<< "$monitors"
   exit 0
 fi
+
