@@ -26,8 +26,11 @@ cp dunstrc.tmpl $DUNSTRC_PATH
 
 # hacky workaround to problem with dunst config not being able to read relative paths.
 # find the lines to replace with paths
-line_nums=$(awk '/<ICON_PATH_PLACEHOLDER>/ {print FNR}' dunstrc.tmpl)
-icon_names=$(ls $SCRIPTPATH/notif-icons)
+line_nums=($(awk '/<ICON_PATH_PLACEHOLDER>/ {print FNR}' dunstrc.tmpl))
+
+# sort the file names
+icon_names=($(ls $SCRIPTPATH/notif-icons | awk '{ print length, $0} ' | sort -n | cut -d" " -f2-))
+
 # iterate and apply each path to each line in the file
 for i in "${!line_nums[@]}"; do
   sed -i "${line_nums[$i]}s|.*|    icon = $SCRIPTPATH/notif-icons/${icon_names[$i]}|" $DUNSTRC_PATH
