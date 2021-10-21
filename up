@@ -36,7 +36,7 @@ for i in "${!line_nums[@]}"; do
   sed -i "${line_nums[$i]}s|.*|    icon = $SCRIPTPATH/notif-icons/${icon_names[$i]}|" $DUNSTRCPATH
 done
 
-# kill previous session and start another with the newly created conf file
+# kill previous session and start another in a detached shell to prevent dunst taking the shell
 bash -c "killall dunst && dunst"
 
 #boot compton or picom if it exists
