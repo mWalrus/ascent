@@ -8,22 +8,22 @@ if [ -f "/tmp/leftwm-theme-down" ]; then
 fi
 ln -s $SCRIPTPATH/down /tmp/leftwm-theme-down
 
-DUNST_DIR=$HOME/.config/dunst
+DUNSTDIR=$HOME/.config/dunst
 
 # create the config dir if nonexistant
-if [ ! -d "$DUNST_DIR" ]; then
-  mkdir -p $DUNST_DIR
+if [ ! -d "$DUNSTDIR" ]; then
+  mkdir -p $DUNSTDIR
 fi
 
-DUNSTRC_PATH="$DUNST_DIR/dunstrc"
+DUNSTRCPATH="$DUNSTDIR/dunstrc"
 
 # check if the rc file exists and remove it if it does
-if [ -f "$DUNSTRC_PATH" ]; then
-  rm -f $DUNSTRC_PATH
+if [ -f "$DUNSTRCPATH" ]; then
+  rm -f $DUNSTRCPATH
 fi
-# Copy the template file to the user config directory
-cp dunstrc.tmpl $DUNSTRC_PATH
 
+# Copy the template file to the user config directory
+cp $SCRIPTPATH/dunstrc.tmpl $DUNSTRCPATH
 # hacky workaround to problem with dunst config not being able to read relative paths.
 # find the lines to replace with paths
 line_nums=($(awk '/<ICON_PATH_PLACEHOLDER>/ {print FNR}' dunstrc.tmpl))
@@ -33,8 +33,11 @@ icon_names=($(ls $SCRIPTPATH/notif-icons | awk '{ print length, $0} ' | sort -n 
 
 # iterate and apply each path to each line in the file
 for i in "${!line_nums[@]}"; do
-  sed -i "${line_nums[$i]}s|.*|    icon = $SCRIPTPATH/notif-icons/${icon_names[$i]}|" $DUNSTRC_PATH
+  sed -i "${line_nums[$i]}s|.*|    icon = $SCRIPTPATH/notif-icons/${icon_names[$i]}|" $DUNSTRCPATH
 done
+
+# kill previous session and start another with the newly created conf file
+bash -c "killall dunst && dunst"
 
 #boot compton or picom if it exists
 if [ -x "$(command -v compton)" ]; then
@@ -60,4 +63,3 @@ if [ -x "$(command -v polybar)" ]; then
   done <<< "$monitors"
   exit 0
 fi
-
