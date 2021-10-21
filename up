@@ -19,25 +19,24 @@ DUNSTRCPATH="$DUNSTDIR/dunstrc"
 
 # check if the rc file exists and remove it if it does
 if [ -f "$DUNSTRCPATH" ]; then
-  rm -f $DUNSTRCPATH
+  /usr/bin/rm -rf
 fi
-
 # Copy the template file to the user config directory
 cp $SCRIPTPATH/dunstrc.tmpl $DUNSTRCPATH
 # hacky workaround to problem with dunst config not being able to read relative paths.
 # find the lines to replace with paths
-line_nums=($(awk '/<ICON_PATH_PLACEHOLDER>/ {print FNR}' dunstrc.tmpl))
+#line_nums=($(awk '/<ICON_PATH_PLACEHOLDER>/ {print FNR}' dunstrc.tmpl))
+#echo $line_nums
+## sort the file names
+#icon_names=($(ls $SCRIPTPATH/notif-icons | awk '{ print length, $0} ' | sort -n | cut -d" " -f2-))
 
-# sort the file names
-icon_names=($(ls $SCRIPTPATH/notif-icons | awk '{ print length, $0} ' | sort -n | cut -d" " -f2-))
-
-# iterate and apply each path to each line in the file
-for i in "${!line_nums[@]}"; do
-  sed -i "${line_nums[$i]}s|.*|    icon = $SCRIPTPATH/notif-icons/${icon_names[$i]}|" $DUNSTRCPATH
-done
+## iterate and apply each path to each line in the file
+#for i in "${!line_nums[@]}"; do
+  #sed -i "${line_nums[$i]}s|.*|    icon_path = $SCRIPTPATH/notif-icons/${icon_names[$i]}|" $DUNSTRCPATH
+#done
 
 # kill previous session and start another in a detached shell to prevent dunst taking the shell
-bash -c "killall dunst && dunst"
+bash -c "killall dunst && dunst -li $SCRIPTPATH/notif-icons/low.png -ni $SCRIPTPATH/notif-icons/normal.png -ci $SCRIPTPATH/notif-icons/critical.png"
 
 #boot compton or picom if it exists
 if [ -x "$(command -v compton)" ]; then
