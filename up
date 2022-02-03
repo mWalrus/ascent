@@ -8,24 +8,53 @@ if [ -f "/tmp/leftwm-theme-down" ]; then
 fi
 ln -s $SCRIPTPATH/down /tmp/leftwm-theme-down
 
-DUNSTDIR=$HOME/.config/dunst
-
-# create the config dir if nonexistant
-if [ ! -d "$DUNSTDIR" ]; then
-  mkdir -p $DUNSTDIR
+# check if dunst is installed and if it is, copy the config
+if [ command -v dunst ]; then
+  DUNSTDIR=$HOME/.config/dunst
+  
+  # create the config dir if nonexistant
+  if [ ! -d "$DUNSTDIR" ]; then
+    mkdir -p $DUNSTDIR
+  fi
+  
+  DUNSTRCPATH="$DUNSTDIR/dunstrc"
+  
+  # check if the rc file exists and move it if it does
+  if [ -f "$DUNSTRCPATH" ]; then
+    mv "$DUNSTRCPATH" "$DUNSTRCPATH.old"
+  fi
+  # Copy the template file to the user config directory
+  cp $SCRIPTPATH/dunstrc.tmpl $DUNSTRCPATH
+  
+  # kill previous session and start another in a detached shell to prevent dunst taking the shell
+  bash -c "killall dunst && dunst"
 fi
 
-DUNSTRCPATH="$DUNSTDIR/dunstrc"
-
-# check if the rc file exists and remove it if it does
-if [ -f "$DUNSTRCPATH" ]; then
-  /usr/bin/rm -rf
+# Install rofi theme if rofi exists on the system
+if [ command -v rofi ]; then
+  ROFIDIR=$HOME/.config/rofi
+  
+  if [ ! -d "$ROFIDIR" ]; then
+    mkdir -p $ROFIDIR
+  fi
+  
+  ROFITHEMEPATH="$ROFIDIR/themes"
+  
+  if [ ! -d "$ROFITHEMEPATH" ]; then
+    mkdir -p $ROFITHEMEPATH
+  fi
+  
+  
+  cp "$SCRIPTPATH/nord.rasi" $ROFITHEMEPATH
+  
+  # preserve the old rofi config if there is one
+  if [ -f "$ROFIDIR/config.rasi" ]; then
+    mv "$ROFIDIR/config.rasi" "$ROFIDIR/config.rasi.old" 
+  fi
+  
+  echo "@theme $HOME/.config/rofi/themes/nord.rasi" > "$ROFIDIR/config.rasi"
+  
 fi
-# Copy the template file to the user config directory
-cp $SCRIPTPATH/dunstrc.tmpl $DUNSTRCPATH
-
-# kill previous session and start another in a detached shell to prevent dunst taking the shell
-bash -c "killall dunst && dunst"
 
 #boot compton or picom if it exists
 if [ -x "$(command -v compton)" ]; then

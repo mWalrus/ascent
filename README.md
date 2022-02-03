@@ -8,7 +8,8 @@ A theme centered around the [Nord Theme](https://nordtheme.com) color palette.
 - leftwm
 - polybar
 - feh
-- dunst (optional)
+- rofi _(optional)_
+- dunst _(optional)_
 
 ## Installing
 1. `git clone https://gitlab.com/mWalrus/ascent.git`
